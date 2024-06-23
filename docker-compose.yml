@@ -26,14 +26,12 @@ services:
     volumes:
       - ./src:/app/src
 
-  pgadmin:
-    image: dpage/pgadmin4
-    restart: always
-    container_name: testapi-pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=pgadmin4
+  adminer:
+    image: adminer
+    container_name: testapi-adminer
     ports:
-      - '5050:80'
+      - '8888:8080'
     depends_on:
       - db
+    environment:
+      - ADMINER_DEFAULT_SERVER=db

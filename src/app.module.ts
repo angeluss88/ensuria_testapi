@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ComissionsModule } from './comissions/comissions.module';
+import { Comissions } from './comissions/comissions.entity';
 
 @Module({
   imports: [
@@ -12,10 +14,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: 'postgres',
       password: 'postgres',
       database: 'postgres',
-      entities: [],
+      entities: [Comissions],
       synchronize: true,
       autoLoadEntities: true,
     }),
+    ComissionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
