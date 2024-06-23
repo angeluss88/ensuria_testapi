@@ -8,7 +8,7 @@ export class Comissions {
   @Column({ type: 'integer', nullable: false, default: 0 })
   comission_A: number;
 
-  @Column({ type: 'integer', nullable: false, default: 0 })
+  @Column({ type: 'float', nullable: false, default: 0 })
   comission_B: number;
 
   @Column({ type: 'integer', nullable: false, default: 0 })

@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ComissionsModule } from './comissions/comissions.module';
 import { Comissions } from './comissions/comissions.entity';
+import { ShopsModule } from './shops/shops.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { Comissions } from './comissions/comissions.entity';
       autoLoadEntities: true,
     }),
     ComissionsModule,
+    ShopsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
