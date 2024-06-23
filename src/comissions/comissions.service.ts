@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comissions } from './comissions.entity';
 import { IsNull, Not, Repository } from 'typeorm';
+import { UpdateComissionsDto } from './updateComossions.dto';
 
 @Injectable()
 export class ComissionsService {
@@ -34,13 +35,13 @@ export class ComissionsService {
     );
   }
 
-  async updateComissions(data: Comissions): Promise<void> {
+  async updateComissions(data: UpdateComissionsDto): Promise<void> {
     const comissions = await this.comissisonsRepository.findOne({});
 
     if (comissions) {
       this.comissisonsRepository.save(Object.assign(comissions, data));
     } else {
-      await this.comissisonsRepository.save(
+      this.comissisonsRepository.save(
         this.comissisonsRepository.create({
           comission_A: data.comission_A ?? 0,
           comission_B: data.comission_B ?? 0,
