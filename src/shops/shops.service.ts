@@ -1,25 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Shop } from './shop.entity';
 import { IsNull, Not, Repository } from 'typeorm';
 import { ShopCreateDto } from './dto/shop-create.dto';
+import { ShopUpdateDto } from './dto/shop-update.dto';
+import { PaymentsService } from 'src/payments/payments.service';
 
 @Injectable()
 export class ShopsService {
   constructor(
     @InjectRepository(Shop)
     private readonly shopsRepository: Repository<Shop>,
+    @Inject(forwardRef(() => PaymentsService))
+    private readonly paymentsService: PaymentsService,
   ) {}
 
-  getShops(): Promise<Shop[]> {
+  async getShops(): Promise<Shop[]> {
     return this.shopsRepository.find({ where: { id: Not(IsNull()) } });
   }
 
-  getShop(id: number): Promise<Shop | null> {
-    return this.shopsRepository.findOne({ where: { id } });
+  async getShop(id: number): Promise<Shop> {
+    return this.shopsRepository.findOneOrFail({ where: { id } });
   }
 
-  createShop(data: ShopCreateDto): Promise<Shop> {
+  async createShop(data: ShopCreateDto): Promise<Shop> {
     return this.shopsRepository.save(
       this.shopsRepository.create({
         name: data.name,
@@ -29,7 +33,13 @@ export class ShopsService {
     );
   }
 
-  async doPayout(id: number): Promise<void> {
-    console.log(`Do Payout for shop #${id}`);
+  async updateShop(id: number, data: ShopUpdateDto): Promise<Shop> {
+    const shop = await this.getShop(id);
+    return this.shopsRepository.save(Object.assign(shop, data));
+  }
+
+  async doPayout(id: number) {
+    const shop = await this.getShop(id);
+    this.paymentsService.payToShop(shop);
   }
 }

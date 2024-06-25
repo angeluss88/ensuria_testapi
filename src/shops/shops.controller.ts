@@ -25,9 +25,7 @@ export class ShopsController {
   }
 
   @Post('/')
-  async setComissions(
-    @Body() data: ShopCreateDto,
-  ): Promise<ShopCreateReturnDto> {
+  async createShop(@Body() data: ShopCreateDto): Promise<ShopCreateReturnDto> {
     const shop: Shop = await this.shopsService.createShop(data);
 
     return ShopCreateReturnDto.transform(shop);

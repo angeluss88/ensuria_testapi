@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ComissionsModule } from './comissions/comissions.module';
 import { Comissions } from './comissions/comissions.entity';
 import { ShopsModule } from './shops/shops.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ShopsModule } from './shops/shops.module';
     }),
     ComissionsModule,
     ShopsModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
