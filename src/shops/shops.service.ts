@@ -20,7 +20,10 @@ export class ShopsService {
   }
 
   async getShop(id: number): Promise<Shop> {
-    return this.shopsRepository.findOneOrFail({ where: { id } });
+    return this.shopsRepository.findOneOrFail({
+      where: { id },
+      relations: { payments: true },
+    });
   }
 
   async createShop(data: ShopCreateDto): Promise<Shop> {

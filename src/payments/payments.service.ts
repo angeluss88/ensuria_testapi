@@ -67,11 +67,6 @@ export class PaymentsService {
       payment.wasDone = true;
     }
 
-    if (data.status === PaymentStatus.paid && !payment.wasPaid) {
-      await this.payToShop(payment.shop);
-      payment.wasPaid = true;
-    }
-
     return this.paymentsRepository.save(Object.assign(payment, data));
   }
 
@@ -80,18 +75,24 @@ export class PaymentsService {
       await this.comissionssService.getComissions();
 
     const paymentAmount =
-      amount - comission_A - amount * comission_B - amount * shop.comission;
+      amount -
+      comission_A -
+      (amount * comission_B) / 100 -
+      (amount * shop.comission) / 100;
+
     if (paymentAmount > 0) {
       shop.balance += paymentAmount;
-      shop.holded += amount * comission_D;
+      shop.holded += (amount * comission_D) / 100;
       this.shopsService.updateShop(shop.id, shop);
+    } else {
+      console.log('PaymentAMount <= 0'); // @TODO any kind of logging
     }
   }
 
   async unholdComissionD(amount: number, shop: Shop): Promise<void> {
     const { comission_D } = await this.comissionssService.getComissions();
 
-    const amountToUnhold = amount * comission_D;
+    const amountToUnhold = (amount * comission_D) / 100;
 
     shop.holded =
       shop.holded > amountToUnhold ? shop.holded - amountToUnhold : 0;
@@ -99,6 +100,8 @@ export class PaymentsService {
   }
 
   async payToShop(shop: Shop): Promise<void> {
+    const { comission_A, comission_B } =
+      await this.comissionssService.getComissions();
     const availableBalance = shop.balance - shop.holded;
 
     const paymentsToPay: Payment[] = await this.paymentsRepository.find({
@@ -119,8 +122,13 @@ export class PaymentsService {
     const { amountToPay, paymentIdsToClose, paymentIdsToUnhold } =
       paymentsToPay.reduce(
         (acc: PayToShopReducerInterface, curr: Payment, i, arr) => {
-          if (acc.amountToPay + curr.amount < availableBalance) {
-            acc.amountToPay += curr.amount;
+          const amountAfterComissions =
+            curr.amount -
+            comission_A -
+            (curr.amount * comission_B) / 100 -
+            (curr.amount * shop.comission) / 100;
+          if (acc.amountToPay + amountAfterComissions < availableBalance) {
+            acc.amountToPay += amountAfterComissions;
             acc.paymentIdsToClose.push(curr.id);
             curr.status === PaymentStatus.handled &&
               acc.paymentIdsToUnhold.push(curr.id);
